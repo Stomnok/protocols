@@ -1,6 +1,9 @@
 package main
 
-import "math/big"
+import (
+	"crypto/rand"
+	"math/big"
+)
 
 
 type DH struct {
@@ -12,12 +15,20 @@ type DH struct {
 }
 
 func (DHthis *DH) SharedSecretGen(B *big.Int) {
-	var temp = big.NewInt(2)
-	DHthis.ss = temp.Exp(B,DHthis.sk,nil)
-	DHthis.ss = temp.Mod(DHthis.ss, DHthis.p)
+	DHthis.ss = big.NewInt(1)
+	DHthis.ss.Exp(B, DHthis.sk, DHthis.p)
 }
 
 func (DHthis *DH) pkGen() {
-	DHthis.pk = DHthis.g.Exp(DHthis.g,DHthis.sk,nil)
-	DHthis.pk = DHthis.g.Mod(DHthis.pk,DHthis.p)
+	DHthis.pk = big.NewInt(1)
+	DHthis.pk.Exp(DHthis.g, DHthis.sk, DHthis.p)
+}
+
+func (DHthis *DH) skGen() {
+	DHthis.sk = big.NewInt(0)
+	max := new(big.Int)
+	max.Exp(big.NewInt(2), big.NewInt(130), nil).Sub(max, big.NewInt(1))
+	n, err := rand.Int(rand.Reader, max)
+	if err != nil {}
+	DHthis.sk.Mod(n,DHthis.p.Sub(DHthis.p,big.NewInt(1)))
 }

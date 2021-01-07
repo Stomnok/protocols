@@ -6,4 +6,5 @@ func main() {
 	Task35Gis1()
 	Task35GisP()
 	Task35GisPSub1()
+	Task57()
 }
