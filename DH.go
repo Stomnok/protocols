@@ -30,5 +30,5 @@ func (DHthis *DH) skGen() {
 	max.Exp(big.NewInt(2), big.NewInt(130), nil).Sub(max, big.NewInt(1))
 	n, err := rand.Int(rand.Reader, max)
 	if err != nil {}
-	DHthis.sk.Mod(n,DHthis.p.Sub(DHthis.p,big.NewInt(1)))
+	DHthis.sk.Mod(n,DHthis.p)
 }

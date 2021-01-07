@@ -41,10 +41,10 @@ func Task57() {
 				continue
 			}
 			rMass = append(rMass, big.NewInt(div))
-			temp := hFromR(div, Oracle.p)
-			hMass = append(hMass, &temp)
-			Oracle.SharedSecretGen(hMass[i])
-			bMass = append(bMass, BruteForce(Oracle.ss, Oracle.p, big.NewInt(div), &temp))
+			h := hFromR(div, Oracle.p)
+			hMass = append(hMass, &h)
+			Oracle.SharedSecretGen(&h)
+			bMass = append(bMass, BruteForce(Oracle.ss, Oracle.p, big.NewInt(div), &h))
 			rMul.Mul(rMul, big.NewInt(div))
 			if rMul.Cmp(q)==1 {
 				break
@@ -53,6 +53,9 @@ func Task57() {
 		}
 		div--
 	}
+	//fmt.Println(rMass)
+	//fmt.Println(hMass)
+	//fmt.Println(bMass)
 	solution,err := crt(bMass, rMass)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -63,13 +66,19 @@ func Task57() {
 
 func hFromR(r int64, p * big.Int) big.Int {
 	//h := rand(1, p)^((p-1)/r) mod p
-	h, err := rand.Int(rand.Reader, p)
-	if err != nil {}
-	var exp = big.NewInt(0)
-	exp.Sub(p,big.NewInt(1))
-	exp.Div(exp, big.NewInt(r))
-	h.Exp(h,exp,p)
-	return *h
+	for true {
+		h, err := rand.Int(rand.Reader, p)
+		if err != nil {
+		}
+		var exp = big.NewInt(0)
+		exp.Sub(p, big.NewInt(1))
+		exp.Div(exp, big.NewInt(r))
+		h.Exp(h, exp, p)
+		if h.Cmp(big.NewInt(1))!=0{
+			return *h
+		}
+	}
+	panic("Не получилось, не фортануло")
 }
 
 func BruteForce(ss, p, r, h *big.Int) *big.Int{
