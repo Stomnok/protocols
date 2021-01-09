@@ -27,45 +27,47 @@ func Task58() {
 		}
 		div++
 	}
-	fmt.Println(div)
+	//fmt.Println(div)
 	h := hFromR(div, Oracle.p)
 	Oracle.SharedSecretGen(&h)
-	x := BruteForce(Oracle.ss, Oracle.p, big.NewInt(div), &h)
+	n := BruteForce(Oracle.ss, Oracle.p, big.NewInt(div), &h)
 	var b = big.NewInt(0)
+	var temp = big.NewInt(0)
+	var y = big.NewInt(0)
 	b.Sub(q,big.NewInt(1))
 	b.Div(b,big.NewInt(div))
-	var temp = big.NewInt(0)
-	temp.Exp(Oracle.g, x, nil)
-	var y = big.NewInt(0)
-	y = Oracle.pk
-	y.Div(y,temp)
+	y.Exp(Oracle.g, n, Oracle.p)//y = Oracle.pk
+	temp.Sub(q,n)
+	temp.Exp(Oracle.g, temp, Oracle.p)
+	y.Mul(y,temp)
+	y.Mod(y,Oracle.p)
 	temp = Oracle.g
 	temp.Exp(temp, big.NewInt(div),nil)
-	result, err := Kangaroo(big.NewInt(0),b, temp, y)
+	result, err := Kangaroo(big.NewInt(0),b, temp, y, Oracle.p)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
 	result.Mul(result,big.NewInt(div))
-	result.Add(result,x)
+	result.Add(result, n)
 	fmt.Println(Oracle.sk)
 	fmt.Println(result)
 }
 
-func Kangaroo(a,b,g,y *big.Int) (*big.Int,error){
+func Kangaroo(a,b,g,y,p *big.Int) (*big.Int,error){
 	max := new(big.Int)
 	max.Exp(big.NewInt(2), big.NewInt(16), nil).Sub(max, big.NewInt(1))
 	k, err := rand.Int(rand.Reader, max)
 	if err != nil {}
 	var xT = big.NewInt(0)
 	var yT = big.NewInt(0)
-	yT.Exp(g,b, nil)
-	N := GetN(k)
+	yT.Exp(g,b, p)
+	N := GetN(k,p)
 	var i = big.NewInt(1)
 	var temp = big.NewInt(0)
-	for i.Cmp(N)==-1{
-		temp = f(yT,k)
+	for i.Cmp(N)<1{
+		temp = f(yT,k,p)
 		xT.Add(xT,temp)
-		temp.Exp(g,temp,nil)
+		temp.Exp(g,temp,p)
 		yT.Mul(yT, temp)
 		i.Add(i,big.NewInt(1))
 	}
@@ -75,10 +77,11 @@ func Kangaroo(a,b,g,y *big.Int) (*big.Int,error){
 	temp.Sub(b,a)
 	temp.Add(temp,xT)
 	var temp1 = big.NewInt(0)
+	fmt.Println("wild kangaroo is started")
 	for xW.Cmp(temp)==-1{
-		temp1 = f(yW,k)
+		temp1 = f(yW,k,p)
 		xW.Add(xW,temp1)
-		temp1.Exp(g,temp,nil)
+		temp1.Exp(g,temp1,p)
 		yW.Mul(yW,temp1)
 		if yW.Cmp(yT)==0{
 			temp1.Add(b,xT)
@@ -89,18 +92,17 @@ func Kangaroo(a,b,g,y *big.Int) (*big.Int,error){
 	return nil, fmt.Errorf("k is bad")
 }
 
-func GetN(k *big.Int) *big.Int{
-	return big.NewInt(2000)
+func GetN(k,p *big.Int) *big.Int{
 	var Sum = big.NewInt(2)
-	Sum.Exp(Sum,k,nil)
+	Sum.Exp(Sum,k,p)
 	Sum.Sub(Sum, big.NewInt(1))
 	Sum.Mul(Sum, big.NewInt(4))
 	return Sum
 }
 
-func f(y,k *big.Int) *big.Int{
+func f(y,k,p *big.Int) *big.Int{
 	var temp = big.NewInt(0)
 	temp.Mod(y, k)
-	temp.Exp(big.NewInt(2),temp,nil)
+	temp.Exp(big.NewInt(2),temp,p)
 	return temp
 }
