@@ -7,6 +7,7 @@ import (
 )
 
 func Task58() {
+	fmt.Println("Task58:")
 	var q = big.NewInt(0)
 	var b = big.NewInt(0)
 	var temp = big.NewInt(0)
@@ -25,12 +26,13 @@ func Task58() {
 	//g'
 	temp = Oracle.g
 	temp.Exp(temp, r, Oracle.p)
+	//y.SetString("3084489376679386611935062264370393043341293895562130111579333858342133481434090291455707557652669703735539078820539319348977398332899686119994926582885352",10)
 	result, err := Kangaroo(big.NewInt(0),b, temp, y, Oracle.p)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
 	result.Mul(result,r)
-	result.Add(result, n)
+	result.Add(result,n)
 	fmt.Println(Oracle.sk)
 	fmt.Println(result)
 }
@@ -38,7 +40,6 @@ func Task58() {
 func Kangaroo(a,b,g,y,p *big.Int) (*big.Int,error){
 	//k
 	//var k = big.NewInt(21)
-	fmt.Println("Task58:")
 	max := new(big.Int)
 	max.Exp(big.NewInt(2), big.NewInt(5), nil).Sub(max, big.NewInt(1))
 	k, err := rand.Int(rand.Reader, max)
