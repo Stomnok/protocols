@@ -56,7 +56,8 @@ func Kangaroo(a,b,g,y,p *big.Int) (*big.Int,error){
 	for i.Cmp(N)<1{
 		temp = f(yT,k,p)
 		xT.Add(xT,temp)
-		temp.Exp(g,temp,p)
+		exp := temp
+		temp.Exp(g,exp,p)
 		yT.Mul(yT, temp)
 		yT.Mod(yT, p)
 		i.Add(i,big.NewInt(1))
@@ -72,7 +73,8 @@ func Kangaroo(a,b,g,y,p *big.Int) (*big.Int,error){
 	for xW.Cmp(temp)==-1{
 		temp1 = f(yW,k,p)
 		xW.Add(xW,temp1)
-		temp1.Exp(g,temp1,p)
+		exp := temp1
+		temp1.Exp(g,exp,p)
 		yW.Mul(yW,temp1)
 		yW.Mod(yW, p)
 		if yW.Cmp(yT)==0{
